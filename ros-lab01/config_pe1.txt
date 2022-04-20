@@ -1,0 +1,57 @@
+## Set-up IPs and interfaces
+
+/interface bridge
+add name=loopback0
+/interface ethernet
+set [ find default-name=ether2 ] disable-running-check=no name=ether2_PE1_PE3
+set [ find default-name=ether3 ] disable-running-check=no name=ether3_PE1_PC1
+set [ find default-name=ether4 ] disable-running-check=no name=ether4_PE1_CE1
+set [ find default-name=ether1 ] disable-running-check=no name=ether1_MGMT
+/ip address
+add address=172.16.0.1/24 interface=ether2_PE1_PE3 network=172.16.0.0
+add address=10.2.2.2 interface=loopback0 network=10.2.2.2
+
+## Set-up MPLS and OSPF backbone
+
+/routing ospf area
+set [ find default=yes ] name=default_backbone
+/routing ospf instance
+set [ find default=yes ] router-id=10.2.2.2
+/routing ospf network
+add area=default_backbone network=10.2.2.2/32
+add area=default_backbone network=172.16.0.0/24
+/mpls ldp
+set enabled=yes lsr-id=10.2.2.2 transport-address=10.2.2.2
+/mpls ldp interface
+add interface=ether2_PE1_PE3 transport-address=10.2.2.2
+
+## Set-up L2VPN
+
+/interface bridge
+add name=bridge_L2VPN
+/routing bgp instance
+set default as=64201 router-id=10.2.2.2
+/routing bgp peer
+add address-families=l2vpn,vpnv4 name=PE2 remote-address=10.4.4.4 remote-as=64201 ttl=default update-source=loopback0
+/interface bridge port
+add bridge=bridge_L2VPN interface=ether3_PE1_PC1
+# add bridge=bridge_L2VPN interface=*7
+/interface vpls bgp-vpls
+add bridge=bridge_L2VPN export-route-targets=100:100 import-route-targets=100:100 name=bgp_vpls_L2VPN route-distinguisher=100:100
+
+## Set-up L3VPN
+
+/ip address
+add address=192.168.100.1/24 interface=ether4_PE1_CE1 network=192.168.100.0
+/routing bgp peer
+add address-families=l2vpn,vpnv4 name=PE3 remote-address=10.3.3.3 remote-as=64201 ttl=default update-source=loopback0
+/routing ospf instance
+add distribute-default=if-installed-as-type-1 name=instance_L3VPN redistribute-bgp=as-type-1 router-id=192.168.100.1 routing-table=vrf_L3VPN
+/routing ospf area
+add instance=instance_L3VPN name=L3VPN_backbone
+/ip route vrf
+add export-route-targets=200:100 import-route-targets=200:100 interfaces=ether4_PE1_CE1 route-distinguisher=200:100 routing-mark=vrf_L3VPN
+/routing bgp instance vrf
+add redistribute-connected=yes redistribute-ospf=yes routing-mark=vrf_L3VPN
+/routing ospf network
+add area=L3VPN_backbone network=192.168.100.0/24

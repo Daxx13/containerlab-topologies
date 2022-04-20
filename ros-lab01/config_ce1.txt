@@ -1,0 +1,18 @@
+## Set-up IPs and interfaces
+
+/interface bridge
+add name=loopback0
+/interface ethernet
+set [ find default-name=ether2 ] disable-running-check=no name=ether2_CE1_PE1
+set [ find default-name=ether1 ] disable-running-check=no name=ether1_MGMT
+/ip address
+add address=192.168.100.2/24 interface=ether2_CE1_PE1 network=192.168.100.0
+add address=10.1.1.1 interface=loopback0 network=10.1.1.1
+
+## Set-up L3VPN
+
+/routing ospf instance
+set [ find default=yes ] router-id=192.168.100.2
+/routing ospf network
+add area=backbone network=192.168.100.0/24
+add area=backbone network=10.1.1.1/32

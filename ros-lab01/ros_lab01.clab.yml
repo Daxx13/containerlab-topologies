@@ -1,0 +1,40 @@
+name: ros_lab01
+
+topology:
+  nodes:
+    pe1:
+      kind: vr-ros
+      startup-config: config_pe1.txt
+      image: vrnetlab/vr-routeros:6.48.6
+    pe2:
+      kind: vr-ros
+      startup-config: config_pe2.txt
+      image: vrnetlab/vr-routeros:6.48.6
+    pe3:
+      kind: vr-ros
+      startup-config: config_pe3.txt
+      image: vrnetlab/vr-routeros:6.48.6
+    ce1:
+      kind: vr-ros
+      startup-config: config_ce1.txt
+      image: vrnetlab/vr-routeros:6.48.6
+    ce2:
+      kind: vr-ros
+      startup-config: config_ce2.txt
+      image: vrnetlab/vr-routeros:6.48.6
+    pc1:
+      kind: linux
+      image: alpine:latest
+    pc2:
+      kind: linux
+      image: alpine:latest
+
+
+  links:
+    - endpoints: ["pc1:eth1", "pe1:eth2"]
+    - endpoints: ["pe1:eth3", "ce1:eth1"]
+    - endpoints: ["pe1:eth1", "pe3:eth2"]
+    - endpoints: ["pe3:eth1", "host:test"]
+    - endpoints: ["pe3:eth3", "pe2:eth1"]
+    - endpoints: ["pe2:eth2", "pc2:eth1"]
+    - endpoints: ["pe2:eth3", "ce2:eth1"]

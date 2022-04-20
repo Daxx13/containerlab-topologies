@@ -1,0 +1,99 @@
+name: dci01
+
+topology:
+  kinds:
+    srl:
+      type: ixrd2
+      image: ghcr.io/nokia/srlinux
+
+  nodes:
+    dc1_sw_dci_01:
+      kind: srl
+      startup-config: config_dc1_sw_dci_01.cli
+    dc1_sw_dci_02:
+      kind: srl
+      startup-config: config_dc1_sw_dci_02.cli
+    dc2_sw_dci_01:
+      kind: srl
+      startup-config: config_dc2_sw_dci_01.cli
+    dc2_sw_dci_02:      
+      kind: srl
+      startup-config: config_dc2_sw_dci_02.cli
+    dc3_sw_dci_01:
+      kind: srl
+      startup-config: config_dc3_sw_dci_01.cli
+    dc3_sw_dci_02:      
+      kind: srl
+      startup-config: config_dc3_sw_dci_02.cli
+
+    dc1_srv_ce_cust1_01:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip link add bond0 type bond miimon 100 mode active-backup
+      - ip link set eth1 down
+      - ip link set eth1 master bond0
+      - ip link set eth2 down
+      - ip link set eth2 master bond0
+      - ip link set bond0 up
+      - ip address add dev bond0 10.0.0.1/24
+    dc2_srv_ce_cust1_02:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip link add bond0 type bond miimon 100 mode active-backup
+      - ip link set eth1 down
+      - ip link set eth1 master bond0
+      - ip link set eth2 down
+      - ip link set eth2 master bond0
+      - ip link set bond0 up
+      - ip address add dev bond0 10.0.0.2/24
+    dc3_srv_ce_cust1_03:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip link add bond0 type bond miimon 100 mode active-backup
+      - ip link set eth1 down
+      - ip link set eth1 master bond0
+      - ip link set eth2 down
+      - ip link set eth2 master bond0
+      - ip link set bond0 up
+      - ip address add dev bond0 10.0.0.3/24
+    dc1_rt_ce_cust2_01:
+      kind: srl
+      startup-config: config_dc1_rt_ce_cust2_01.cli
+    dc2_rt_ce_cust2_02:
+      kind: srl
+      startup-config: config_dc2_rt_ce_cust2_02.cli
+    dc3_rt_ce_cust2_03:
+      kind: srl
+      startup-config: config_dc3_rt_ce_cust2_03.cli
+
+  links:
+    - endpoints: ["dc1_sw_dci_01:e1-49", "dc2_sw_dci_01:e1-49"]
+    - endpoints: ["dc1_sw_dci_01:e1-50", "dc2_sw_dci_01:e1-50"]
+    - endpoints: ["dc1_sw_dci_01:e1-51", "dc3_sw_dci_01:e1-49"]
+    - endpoints: ["dc1_sw_dci_02:e1-49", "dc2_sw_dci_02:e1-49"]
+    - endpoints: ["dc2_sw_dci_01:e1-51", "dc3_sw_dci_02:e1-49"]
+
+    - endpoints: ["dc1_sw_dci_01:e1-55", "dc1_sw_dci_02:e1-55"]
+    - endpoints: ["dc1_sw_dci_01:e1-56", "dc1_sw_dci_02:e1-56"]
+    - endpoints: ["dc1_sw_dci_01:e1-1", "dc1_srv_ce_cust1_01:eth1"]
+    - endpoints: ["dc1_sw_dci_01:e1-2", "dc1_rt_ce_cust2_01:e1-1"]
+    - endpoints: ["dc1_sw_dci_02:e1-1", "dc1_srv_ce_cust1_01:eth2"]
+    - endpoints: ["dc1_sw_dci_02:e1-2", "dc1_rt_ce_cust2_01:e1-2"]
+
+    - endpoints: ["dc2_sw_dci_01:e1-55", "dc2_sw_dci_02:e1-55"]
+    - endpoints: ["dc2_sw_dci_01:e1-56", "dc2_sw_dci_02:e1-56"]
+    - endpoints: ["dc2_sw_dci_01:e1-1", "dc2_srv_ce_cust1_02:eth1"]
+    - endpoints: ["dc2_sw_dci_01:e1-2", "dc2_rt_ce_cust2_02:e1-1"]
+    - endpoints: ["dc2_sw_dci_02:e1-1", "dc2_srv_ce_cust1_02:eth2"]
+    - endpoints: ["dc2_sw_dci_02:e1-2", "dc2_rt_ce_cust2_02:e1-2"]
+
+    - endpoints: ["dc3_sw_dci_01:e1-55", "dc3_sw_dci_02:e1-55"]
+    - endpoints: ["dc3_sw_dci_01:e1-56", "dc3_sw_dci_02:e1-56"]
+    - endpoints: ["dc3_sw_dci_01:e1-1", "dc3_srv_ce_cust1_03:eth1"]
+    - endpoints: ["dc3_sw_dci_01:e1-2", "dc3_rt_ce_cust2_03:e1-1"]
+    - endpoints: ["dc3_sw_dci_02:e1-1", "dc3_srv_ce_cust1_03:eth2"]
+    - endpoints: ["dc3_sw_dci_02:e1-2", "dc3_rt_ce_cust2_03:e1-2"]
+

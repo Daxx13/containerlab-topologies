@@ -1,0 +1,53 @@
+## Set-up IPs and interfaces
+
+/interface bridge
+add name=loopback0
+/interface ethernet
+set [ find default-name=ether2 ] disable-running-check=no name=ether2_603
+set [ find default-name=ether3 ] disable-running-check=no name=ether3_PE3_PE1
+set [ find default-name=ether4 ] disable-running-check=no name=ether4_PE3_PE2
+set [ find default-name=ether1 ] disable-running-check=no name=ether1_MGMT
+/ip address
+add address=172.16.0.2/24 interface=ether3_PE3_PE1 network=172.16.0.0
+add address=172.17.0.1/24 interface=ether4_PE3_PE2 network=172.17.0.0
+add address=10.3.3.3 interface=loopback0 network=10.3.3.3
+
+## Set-up MPLS and OSPF backbone
+
+/routing ospf area
+set [ find default=yes ] name=default_backbone
+/routing ospf instance
+set [ find default=yes ] router-id=10.3.3.3
+/routing ospf network
+add area=default_backbone network=10.3.3.3/32
+add area=default_backbone network=172.16.0.0/24
+add area=default_backbone network=172.17.0.0/24
+/mpls ldp
+set enabled=yes lsr-id=10.3.3.3 transport-address=10.3.3.3
+/mpls ldp interface
+add interface=ether3_PE3_PE1
+add interface=ether4_PE3_PE2
+
+## Set-up L3VPN internet access
+
+/routing bgp instance
+set default as=64201 router-id=10.3.3.3
+/routing bgp peer
+add address-families=vpnv4 name=PE1 remote-address=10.2.2.2 remote-as=64201 ttl=default update-source=loopback0
+add address-families=vpnv4 name=PE2 remote-address=10.4.4.4 remote-as=64201 ttl=default update-source=loopback0
+/ip dhcp-client
+add disabled=no interface=ether2_603
+/ip firewall filter
+add action=accept chain=input comment="WAN Accept ICMP" protocol=icmp
+add action=accept chain=input comment="WAN Accept ESTABLISHED" connection-state=established,related in-interface=ether2_603
+add action=drop chain=input comment="WAN default DROP" in-interface=ether2_603
+/ip firewall mangle
+add action=mark-routing chain=prerouting dst-address=0.0.0.0/0 new-routing-mark=vrf_L3VPN passthrough=yes
+/ip firewall nat
+add action=masquerade chain=srcnat comment="Masquerade all WAN-out interface traffic" out-interface=ether2_603
+/ip route vrf
+add export-route-targets=200:100 import-route-targets=200:100 route-distinguisher=200:100 routing-mark=vrf_L3VPN
+add export-route-targets=999:999,200:100 import-route-targets=999:999 interfaces=ether2_603 route-distinguisher=999:999 routing-mark=vrf_internet
+/routing bgp instance vrf
+add routing-mark=vrf_L3VPN
+add routing-mark=vrf_internet

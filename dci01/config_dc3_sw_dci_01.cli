@@ -1,0 +1,127 @@
+# Initial interface configuration
+
+set / interface ethernet-1/55 admin-state enable
+set / interface ethernet-1/55 subinterface 0 ipv4 address 10.255.103.1/30
+set / interface ethernet-1/56 admin-state enable
+set / interface ethernet-1/56 subinterface 0 ipv4 address 10.255.103.5/30
+set / network-instance default interface ethernet-1/55.0
+set / network-instance default interface ethernet-1/56.0
+
+set / interface system0 admin-state enable
+set / interface system0 subinterface 0 ipv4 address 10.0.3.1/32
+set / network-instance default interface system0.0
+
+set / interface ethernet-1/49 admin-state enable
+set / interface ethernet-1/49 subinterface 0 ipv4 address 10.255.4.2/30
+set / network-instance default interface ethernet-1/49.0
+
+# Set up BGP underlay
+
+set / routing-policy policy all default-action accept
+set / network-instance default protocols bgp ipv4-unicast multipath max-paths-level-1 8
+set / network-instance default protocols bgp router-id 10.0.3.1
+set / network-instance default protocols bgp autonomous-system 65003
+set / network-instance default protocols bgp group iBGP-underlay peer-as 65003
+set / network-instance default protocols bgp group iBGP-underlay import-policy all
+set / network-instance default protocols bgp group iBGP-underlay export-policy all
+set / network-instance default protocols bgp group iBGP-underlay next-hop-self true
+set / network-instance default protocols bgp ipv4-unicast admin-state enable
+set / network-instance default protocols bgp neighbor 10.255.103.2 peer-group iBGP-underlay
+set / network-instance default protocols bgp neighbor 10.255.103.2 transport local-address 10.255.103.1
+set / network-instance default protocols bgp neighbor 10.255.103.6 peer-group iBGP-underlay
+set / network-instance default protocols bgp neighbor 10.255.103.6 transport local-address 10.255.103.5
+
+set / network-instance default protocols bgp group eBGP-underlay-65001 peer-as 65001
+set / network-instance default protocols bgp group eBGP-underlay-65001 import-policy all
+set / network-instance default protocols bgp group eBGP-underlay-65001 export-policy all
+set / network-instance default protocols bgp neighbor 10.255.4.1 peer-group eBGP-underlay-65001
+set / network-instance default protocols bgp neighbor 10.255.4.1 transport local-address 10.255.4.2
+
+# Set up BGP overlay
+
+set / network-instance default protocols bgp group iBGP-overlay import-policy all
+set / network-instance default protocols bgp group iBGP-overlay export-policy all
+set / network-instance default protocols bgp group iBGP-overlay peer-as 65000
+set / network-instance default protocols bgp group iBGP-overlay local-as 65000
+set / network-instance default protocols bgp group iBGP-overlay ipv4-unicast admin-state disable
+set / network-instance default protocols bgp group iBGP-overlay evpn admin-state enable
+set / network-instance default protocols bgp group iBGP-overlay timers minimum-advertisement-interval 1
+
+set / network-instance default protocols bgp neighbor 10.0.1.1 peer-group iBGP-overlay
+set / network-instance default protocols bgp neighbor 10.0.1.2 peer-group iBGP-overlay
+set / network-instance default protocols bgp neighbor 10.0.2.1 peer-group iBGP-overlay
+set / network-instance default protocols bgp neighbor 10.0.2.2 peer-group iBGP-overlay
+set / network-instance default protocols bgp neighbor 10.0.3.2 peer-group iBGP-overlay
+
+set / network-instance default protocols bgp failure-detection enable-bfd true
+
+# Set up customer 1 active/standby P2MP L2VPN
+
+set / interface ethernet-1/1 vlan-tagging true
+set / interface ethernet-1/1 subinterface 0 type bridged
+set / interface ethernet-1/1 subinterface 0 vlan encap untagged
+set / interface ethernet-1/1 ethernet standby-signaling power-off
+
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 multi-homing-mode single-active
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 df-election interface-standby-signaling-on-non-df
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 df-election algorithm type preference
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 df-election algorithm preference-alg preference-value 100
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 admin-state enable
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 esi 00:00:00:00:01:00:00:01:00:03
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust1 interface ethernet-1/1
+set / system network-instance protocols bgp-vpn bgp-instance 1
+
+set / tunnel-interface vxlan1 vxlan-interface 0 type bridged ingress vni 1001
+
+set / network-instance vrf-cust1 type mac-vrf
+set / network-instance vrf-cust1 admin-state enable
+set / network-instance vrf-cust1 interface ethernet-1/1.0
+set / network-instance vrf-cust1 vxlan-interface vxlan1.0
+
+set / network-instance vrf-cust1 protocols bgp-evpn bgp-instance 1 admin-state enable
+set / network-instance vrf-cust1 protocols bgp-evpn bgp-instance 1 vxlan-interface vxlan1.0
+set / network-instance vrf-cust1 protocols bgp-evpn bgp-instance 1 evi 1001
+set / network-instance vrf-cust1 protocols bgp-evpn bgp-instance 1 ecmp 8
+
+set / network-instance vrf-cust1 protocols bgp-vpn bgp-instance 1 route-target export-rt target:65101:100
+set / network-instance vrf-cust1 protocols bgp-vpn bgp-instance 1 route-target import-rt target:65101:100
+
+# Set up customer 2 active/active ESI-LAG P2MP L2VPN
+
+set / interface ethernet-1/2 ethernet aggregate-id lag1
+
+set / interface lag1 admin-state enable
+set / interface lag1 vlan-tagging true
+set / interface lag1 lag lag-type lacp 
+set / interface lag1 lag member-speed 100G
+set / interface lag1 lag lacp interval FAST
+set / interface lag1 lag lacp lacp-mode ACTIVE
+set / interface lag1 lag lacp admin-key 24
+set / interface lag1 lag lacp system-id-mac 00:00:00:00:00:13
+set / interface lag1 lag lacp system-priority 24
+set / interface lag1 subinterface 0 type bridged
+set / interface lag1 subinterface 0 vlan encap single-tagged vlan-id any
+
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 df-election algorithm type preference
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 df-election algorithm preference-alg preference-value 100
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 admin-state enable
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 esi 00:00:00:00:02:00:00:01:00:03
+set / system network-instance protocols evpn ethernet-segments bgp-instance 1 ethernet-segment ES-cust2 interface lag1
+set / system network-instance protocols bgp-vpn bgp-instance 1
+
+set / tunnel-interface vxlan1 vxlan-interface 1 type bridged ingress vni 2001
+
+set / network-instance vrf-cust2 type mac-vrf
+set / network-instance vrf-cust2 admin-state enable
+set / network-instance vrf-cust2 interface lag1.0
+set / network-instance vrf-cust2 vxlan-interface vxlan1.1
+
+set / network-instance vrf-cust2 protocols bgp-evpn bgp-instance 1 admin-state enable
+set / network-instance vrf-cust2 protocols bgp-evpn bgp-instance 1 vxlan-interface vxlan1.1
+set / network-instance vrf-cust2 protocols bgp-evpn bgp-instance 1 evi 2001
+set / network-instance vrf-cust2 protocols bgp-evpn bgp-instance 1 ecmp 8
+
+set / network-instance vrf-cust2 protocols bgp-vpn bgp-instance 1 route-target export-rt target:65102:100
+set / network-instance vrf-cust2 protocols bgp-vpn bgp-instance 1 route-target import-rt target:65102:100
