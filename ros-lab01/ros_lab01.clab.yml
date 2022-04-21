@@ -25,10 +25,13 @@ topology:
     pc1:
       kind: linux
       image: alpine:latest
+      exec:
+      - ip address add dev eth1 10.0.0.1/24
     pc2:
       kind: linux
       image: alpine:latest
-
+      exec:
+      - ip address add dev eth1 10.0.0.2/24
 
   links:
     - endpoints: ["pc1:eth1", "pe1:eth2"]
