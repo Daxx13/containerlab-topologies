@@ -3,7 +3,7 @@
 /interface bridge
 add name=loopback0
 /interface ethernet
-set [ find default-name=ether2 ] disable-running-check=no name=ether2_603
+set [ find default-name=ether2 ] disable-running-check=no name=ether2_WAN_DHCP
 set [ find default-name=ether3 ] disable-running-check=no name=ether3_PE3_PE1
 set [ find default-name=ether4 ] disable-running-check=no name=ether4_PE3_PE2
 set [ find default-name=ether1 ] disable-running-check=no name=ether1_MGMT
@@ -36,18 +36,18 @@ set default as=64201 router-id=10.3.3.3
 add address-families=vpnv4 name=PE1 remote-address=10.2.2.2 remote-as=64201 ttl=default update-source=loopback0
 add address-families=vpnv4 name=PE2 remote-address=10.4.4.4 remote-as=64201 ttl=default update-source=loopback0
 /ip dhcp-client
-add disabled=no interface=ether2_603
+add disabled=no interface=ether2_WAN_DHCP
 /ip firewall filter
 add action=accept chain=input comment="WAN Accept ICMP" protocol=icmp
-add action=accept chain=input comment="WAN Accept ESTABLISHED" connection-state=established,related in-interface=ether2_603
-add action=drop chain=input comment="WAN default DROP" in-interface=ether2_603
+add action=accept chain=input comment="WAN Accept ESTABLISHED" connection-state=established,related in-interface=ether2_WAN_DHCP
+add action=drop chain=input comment="WAN default DROP" in-interface=ether2_WAN_DHCP
 /ip firewall mangle
 add action=mark-routing chain=prerouting dst-address=0.0.0.0/0 new-routing-mark=vrf_L3VPN passthrough=yes
 /ip firewall nat
-add action=masquerade chain=srcnat comment="Masquerade all WAN-out interface traffic" out-interface=ether2_603
+add action=masquerade chain=srcnat comment="Masquerade all WAN-out interface traffic" out-interface=ether2_WAN_DHCP
 /ip route vrf
 add export-route-targets=200:100 import-route-targets=200:100 route-distinguisher=200:100 routing-mark=vrf_L3VPN
-add export-route-targets=999:999,200:100 import-route-targets=999:999 interfaces=ether2_603 route-distinguisher=999:999 routing-mark=vrf_internet
+add export-route-targets=999:999,200:100 import-route-targets=999:999 interfaces=ether2_WAN_DHCP route-distinguisher=999:999 routing-mark=vrf_internet
 /routing bgp instance vrf
 add routing-mark=vrf_L3VPN
 add routing-mark=vrf_internet
