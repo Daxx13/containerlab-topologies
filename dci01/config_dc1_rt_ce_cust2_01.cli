@@ -10,10 +10,14 @@ set / interface lag1 lag lag-type lacp
 set / interface lag1 lag member-speed 25G
 set / interface lag1 lag lacp interval FAST
 set / interface lag1 lag lacp lacp-mode ACTIVE
+set / interface lag1 subinterface 0 admin-state enable
 set / interface lag1 subinterface 0 type routed
+set / interface lag1 subinterface 0 ipv4 admin-state enable
 set / interface lag1 subinterface 0 ipv4 address 10.100.0.1/24
 set / interface lag1 subinterface 0 vlan encap single-tagged vlan-id 100
+set / interface lag1 subinterface 1 admin-state enable
 set / interface lag1 subinterface 1 type routed
+set / interface lag1 subinterface 1 ipv4 admin-state enable
 set / interface lag1 subinterface 1 ipv4 address 10.200.0.1/24
 set / interface lag1 subinterface 1 vlan encap single-tagged vlan-id 200
 
