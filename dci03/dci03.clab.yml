@@ -3,22 +3,22 @@ name: dci03
 topology:
   nodes:
 
-    dc1_rr1:
+    dc1_cr1:
       kind: linux
       image: frrouting/frr:v8.4.1
       binds:
-        - dc1_rr1/daemons:/etc/frr/daemons
-        - dc1_rr1/frr.conf:/etc/frr/frr.conf
+        - dc1_cr1/daemons:/etc/frr/daemons
+        - dc1_cr1/frr.conf:/etc/frr/frr.conf
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
 
-    dc1_rr2:
+    dc1_cr2:
       kind: linux
       image: frrouting/frr:v8.4.1
       binds:
-        - dc1_rr2/daemons:/etc/frr/daemons
-        - dc1_rr2/frr.conf:/etc/frr/frr.conf
+        - dc1_cr2/daemons:/etc/frr/daemons
+        - dc1_cr2/frr.conf:/etc/frr/frr.conf
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
@@ -63,22 +63,22 @@ topology:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
 
-    dc2_rr1:
+    dc2_cr1:
       kind: linux
       image: frrouting/frr:v8.4.1
       binds:
-        - dc2_rr1/daemons:/etc/frr/daemons
-        - dc2_rr1/frr.conf:/etc/frr/frr.conf
+        - dc2_cr1/daemons:/etc/frr/daemons
+        - dc2_cr1/frr.conf:/etc/frr/frr.conf
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
 
-    dc2_rr2:
+    dc2_cr2:
       kind: linux
       image: frrouting/frr:v8.4.1
       binds:
-        - dc2_rr2/daemons:/etc/frr/daemons
-        - dc2_rr2/frr.conf:/etc/frr/frr.conf
+        - dc2_cr2/daemons:/etc/frr/daemons
+        - dc2_cr2/frr.conf:/etc/frr/frr.conf
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
@@ -125,24 +125,24 @@ topology:
 
 
   links:
-    - endpoints: ["dc1_rr1:eth1", "dc2_rr1:eth1"]
-    - endpoints: ["dc1_rr1:eth2", "dc2_rr2:eth1"]
-    - endpoints: ["dc1_rr2:eth1", "dc2_rr1:eth2"]
-    - endpoints: ["dc1_rr2:eth2", "dc2_rr2:eth2"]
+    - endpoints: ["dc1_cr1:eth1", "dc2_cr1:eth1"]
+    - endpoints: ["dc1_cr1:eth2", "dc2_cr2:eth1"]
+    - endpoints: ["dc1_cr2:eth1", "dc2_cr1:eth2"]
+    - endpoints: ["dc1_cr2:eth2", "dc2_cr2:eth2"]
 
-    - endpoints: ["dc1_rr1:eth3", "dc1_s1:eth1"]
-    - endpoints: ["dc1_rr1:eth4", "dc1_s2:eth1"]
-    - endpoints: ["dc1_rr2:eth3", "dc1_s1:eth2"]
-    - endpoints: ["dc1_rr2:eth4", "dc1_s2:eth2"]
+    - endpoints: ["dc1_cr1:eth3", "dc1_s1:eth1"]
+    - endpoints: ["dc1_cr1:eth4", "dc1_s2:eth1"]
+    - endpoints: ["dc1_cr2:eth3", "dc1_s1:eth2"]
+    - endpoints: ["dc1_cr2:eth4", "dc1_s2:eth2"]
     - endpoints: ["dc1_s1:eth3", "dc1_l1:eth1"]
     - endpoints: ["dc1_s1:eth4", "dc1_l2:eth1"]
     - endpoints: ["dc1_s2:eth3", "dc1_l1:eth2"]
     - endpoints: ["dc1_s2:eth4", "dc1_l2:eth2"]
 
-    - endpoints: ["dc2_rr1:eth3", "dc2_s1:eth1"]
-    - endpoints: ["dc2_rr1:eth4", "dc2_s2:eth1"]
-    - endpoints: ["dc2_rr2:eth3", "dc2_s1:eth2"]
-    - endpoints: ["dc2_rr2:eth4", "dc2_s2:eth2"]
+    - endpoints: ["dc2_cr1:eth3", "dc2_s1:eth1"]
+    - endpoints: ["dc2_cr1:eth4", "dc2_s2:eth1"]
+    - endpoints: ["dc2_cr2:eth3", "dc2_s1:eth2"]
+    - endpoints: ["dc2_cr2:eth4", "dc2_s2:eth2"]
     - endpoints: ["dc2_s1:eth3", "dc2_l1:eth1"]
     - endpoints: ["dc2_s1:eth4", "dc2_l2:eth1"]
     - endpoints: ["dc2_s2:eth3", "dc2_l1:eth2"]

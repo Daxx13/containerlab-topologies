@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Definir el array de nombres
-nombres=("dc1_rr1" "dc1_rr2" "dc1_s1" "dc1_s2" "dc1_l1" "dc1_l2" "dc2_rr1" "dc2_rr2" "dc2_s1" "dc2_s2" "dc2_l1" "dc2_l2")
+nombres=("dc1_cr1" "dc1_cr2" "dc1_s1" "dc1_s2" "dc1_l1" "dc1_l2" "dc2_cr1" "dc2_cr2" "dc2_s1" "dc2_s2" "dc2_l1" "dc2_l2")
 
 # Iterar sobre cada elemento del array
 for nombre in "${nombres[@]}"; do
