@@ -1,0 +1,149 @@
+name: dci03
+
+topology:
+  nodes:
+
+    dc1_rr1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_rr1/daemons:/etc/frr/daemons
+        - dc1_rr1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc1_rr2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_rr2/daemons:/etc/frr/daemons
+        - dc1_rr2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc1_s1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_s1/daemons:/etc/frr/daemons
+        - dc1_s1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc1_s2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_s2/daemons:/etc/frr/daemons
+        - dc1_s2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc1_l1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_l1/daemons:/etc/frr/daemons
+        - dc1_l1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc1_l2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc1_l2/daemons:/etc/frr/daemons
+        - dc1_l2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_rr1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_rr1/daemons:/etc/frr/daemons
+        - dc2_rr1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_rr2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_rr2/daemons:/etc/frr/daemons
+        - dc2_rr2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_s1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_s1/daemons:/etc/frr/daemons
+        - dc2_s1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_s2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_s2/daemons:/etc/frr/daemons
+        - dc2_s2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_l1:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_l1/daemons:/etc/frr/daemons
+        - dc2_l1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+    dc2_l2:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - dc2_l2/daemons:/etc/frr/daemons
+        - dc2_l2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip -6 route del default
+
+
+  links:
+    - endpoints: ["dc1_rr1:eth1", "dc2_rr1:eth1"]
+    - endpoints: ["dc1_rr1:eth2", "dc2_rr2:eth1"]
+    - endpoints: ["dc1_rr2:eth1", "dc2_rr1:eth2"]
+    - endpoints: ["dc1_rr2:eth2", "dc2_rr2:eth2"]
+
+    - endpoints: ["dc1_rr1:eth3", "dc1_s1:eth1"]
+    - endpoints: ["dc1_rr1:eth4", "dc1_s2:eth1"]
+    - endpoints: ["dc1_rr2:eth3", "dc1_s1:eth2"]
+    - endpoints: ["dc1_rr2:eth4", "dc1_s2:eth2"]
+    - endpoints: ["dc1_s1:eth3", "dc1_l1:eth1"]
+    - endpoints: ["dc1_s1:eth4", "dc1_l2:eth1"]
+    - endpoints: ["dc1_s2:eth3", "dc1_l1:eth2"]
+    - endpoints: ["dc1_s2:eth4", "dc1_l2:eth2"]
+
+    - endpoints: ["dc2_rr1:eth3", "dc2_s1:eth1"]
+    - endpoints: ["dc2_rr1:eth4", "dc2_s2:eth1"]
+    - endpoints: ["dc2_rr2:eth3", "dc2_s1:eth2"]
+    - endpoints: ["dc2_rr2:eth4", "dc2_s2:eth2"]
+    - endpoints: ["dc2_s1:eth3", "dc2_l1:eth1"]
+    - endpoints: ["dc2_s1:eth4", "dc2_l2:eth1"]
+    - endpoints: ["dc2_s2:eth3", "dc2_l1:eth2"]
+    - endpoints: ["dc2_s2:eth4", "dc2_l2:eth2"]
