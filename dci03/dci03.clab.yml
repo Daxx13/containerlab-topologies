@@ -52,6 +52,18 @@ topology:
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
+        - ip link add br50 type bridge
+        - ip link set br50 addrgenmode none
+        - ip link set br50 addr aa:bb:dd:00:10:10
+        - ip link add vni550 type vxlan local "2001:db8:10:10:1::" dstport 4789 id 550 nolearning
+        - ip link set vni550 master br50 addrgenmode none
+        - ip link set vni550 type bridge_slave neigh_suppress on learning off
+        - sysctl -w net.ipv4.conf.br50.forwarding=0
+        - sysctl -w net.ipv6.conf.br50.forwarding=0
+        - ip link set vni550 up
+        - ip link set br50 up
+        - ip link set eth3 master br50
+
 
     dc1_l2:
       kind: linux
@@ -112,6 +124,17 @@ topology:
       exec:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
+        - ip link add br50 type bridge
+        - ip link set br50 addrgenmode none
+        - ip link set br50 addr aa:bb:dd:00:20:20
+        - ip link add vni550 type vxlan local "2001:db8:20:10:1::" dstport 4789 id 550 nolearning
+        - ip link set vni550 master br50 addrgenmode none
+        - ip link set vni550 type bridge_slave neigh_suppress on learning off
+        - sysctl -w net.ipv4.conf.br50.forwarding=0
+        - sysctl -w net.ipv6.conf.br50.forwarding=0
+        - ip link set vni550 up
+        - ip link set br50 up
+        - ip link set eth3 master br50
 
     dc2_l2:
       kind: linux
@@ -123,6 +146,17 @@ topology:
         - sysctl -w net.ipv6.conf.all.forwarding=1
         - ip -6 route del default
 
+    c1_cpe1:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 10.0.0.1/24
+
+    c1_cpe2:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 10.0.0.2/24
 
   links:
     - endpoints: ["dc1_cr1:eth1", "dc2_cr1:eth1"]
@@ -147,3 +181,6 @@ topology:
     - endpoints: ["dc2_s1:eth4", "dc2_l2:eth1"]
     - endpoints: ["dc2_s2:eth3", "dc2_l1:eth2"]
     - endpoints: ["dc2_s2:eth4", "dc2_l2:eth2"]
+
+    - endpoints: ["dc1_l1:eth3", "c1_cpe1:eth1"]
+    - endpoints: ["dc2_l1:eth3", "c1_cpe2:eth1"]
