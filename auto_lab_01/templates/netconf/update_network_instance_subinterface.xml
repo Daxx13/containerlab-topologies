@@ -1,0 +1,11 @@
+<edit-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda" xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+    <datastore>ds:candidate</datastore>
+    <config>
+        <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+            <name>{{ network_instance }}</name>
+            <interface>
+                <name>{{ interface_name }}</name>
+            </interface>
+        </network-instance>
+    </config>
+</edit-data>

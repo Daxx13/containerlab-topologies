@@ -1,0 +1,26 @@
+
+{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "set",
+    "params": {
+        "commands": 
+        [
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/admin-state",
+                "value": "{{ admin_state }}"
+            },
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/version",
+                "value": "{{ version }}"
+            },
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/router-id",
+                "value": "{{ router_id }}"
+            }
+        ]
+    }
+}

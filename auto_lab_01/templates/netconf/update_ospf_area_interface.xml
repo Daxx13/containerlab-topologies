@@ -1,0 +1,23 @@
+<edit-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda" xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+    <datastore>ds:candidate</datastore>
+    <config>
+        <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+            <name>{{ network_instance }}</name>
+            <protocols>
+                <ospf xmlns="urn:nokia.com:srlinux:ospf:ospf">
+                    <instance>
+                        <name>{{ ospf_instance }}</name>
+                        <area>
+                            <area-id>{{ area_id }}</area-id>
+                            <interface>
+                                <interface-name>{{ interface_name }}</interface-name>
+                                <interface-type>{{ interface_type }}</interface-type>
+                                <passive>{{ "true" if passive else "false" }}</passive>
+                            </interface>
+                        </area>
+                    </instance>
+                </ospf>
+            </protocols>
+        </network-instance>
+    </config>
+</edit-data>

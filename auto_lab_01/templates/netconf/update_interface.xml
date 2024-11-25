@@ -1,0 +1,10 @@
+<edit-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda" xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+    <datastore>ds:candidate</datastore>
+    <config>
+        <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+            <name>{{ interface_name }}</name>
+            <admin-state>{{ admin_state }}</admin-state>
+            <description>{{ description }}</description>
+        </interface>
+    </config>
+</edit-data>

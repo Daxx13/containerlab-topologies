@@ -1,0 +1,20 @@
+<edit-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda" xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+    <datastore>ds:candidate</datastore>
+    <config>
+        <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+            <name>{{ network_instance }}</name>
+            <protocols>
+                <ospf xmlns="urn:nokia.com:srlinux:ospf:ospf">
+                    <instance>
+                        <name>{{ ospf_instance }}</name>
+                        <admin-state>{{ admin_state }}</admin-state>
+                        <version xmlns:srl_nokia-ospf-types="urn:nokia.com:srlinux:general:ospf-types">
+                            srl_nokia-ospf-types:{{ version }}
+                        </version>
+                        <router-id>{{ router_id }}</router-id>
+                    </instance>
+                </ospf>
+            </protocols>
+        </network-instance>
+    </config>
+</edit-data>
