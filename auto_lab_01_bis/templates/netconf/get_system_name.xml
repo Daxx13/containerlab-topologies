@@ -1,0 +1,9 @@
+<get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <filter type="subtree">
+        <system xmlns="urn:nokia.com:srlinux:general:system">
+            <name xmlns="urn:nokia.com:srlinux:chassis:system-name">
+                <host-name />
+            </name>
+        </system>
+    </filter>
+</get>

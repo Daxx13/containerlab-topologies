@@ -1,0 +1,62 @@
+<edit-config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <target>
+    <candidate/>
+  </target>
+  <config>
+    {% for interface_name, interface in interface.items() %}
+    <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+      <name>{{ interface_name }}</name>
+      <admin-state>{{ interface.admin_state }}</admin-state>
+      <description>{{ interface.description }}</description>
+        {% for subinterface_id, subinterface in interface.subinterface.items() %}
+        <subinterface>
+      <index>{{ subinterface_id }}</index>
+      <admin-state>{{ subinterface.admin_state }}</admin-state>
+        <ipv4>
+          <admin-state>{{ subinterface.ipv4.admin_state }}</admin-state>
+          <address>
+            <ip-prefix>{{ subinterface.ipv4.address }}</ip-prefix>
+          </address>
+        </ipv4>
+      </subinterface>
+      {% endfor %}
+    </interface>
+    {% endfor %}
+    {% for network_instance_name, network_instance in network_instance.items() %}
+    <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+      <name>{{ network_instance_name }}</name>
+      {% for interface_name in network_instance.interface %}
+      <interface>
+        <name>{{ interface_name }}</name>
+      </interface>
+      {% endfor %}
+      <protocols>
+      <ospf xmlns="urn:nokia.com:srlinux:ospf:ospf">
+        {% for ospf_instance_name, ospf_instance in network_instance.protocols.ospf.items() %}
+        <instance>
+          <name>{{ ospf_instance_name }}</name>
+          <admin-state>{{ ospf_instance.admin_state }}</admin-state>
+          <version xmlns:srl_nokia-ospf-types="urn:nokia.com:srlinux:general:ospf-types">
+            srl_nokia-ospf-types:{{ ospf_instance.version }}
+          </version>
+          <router-id>{{ ospf_instance.router_id }}</router-id>
+          {% for area_id, area in ospf_instance.area.items() %}
+          <area>
+            <area-id>{{ area_id }}</area-id>
+            {% for interface_name, interface in area.interface.items() %}
+            <interface>
+              <interface-name>{{ interface_name }}</interface-name>
+              <interface-type>{{ interface.type }}</interface-type>
+              <passive>{{ interface.passive if interface.passive is defined else "false" }}</passive>
+            </interface>
+            {% endfor %}
+          </area>
+          {% endfor %}
+        </instance>
+        {% endfor %}
+      </ospf>
+      </protocols>
+    </network-instance>
+    {% endfor %}
+  </config>
+</edit-config>

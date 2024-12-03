@@ -1,0 +1,29 @@
+
+{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "set",
+    "params": {
+        "commands": 
+        [
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/area[area-id='{{ area_id }}']"
+            },
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/area[area-id='{{ area_id }}']/interface[interface-name='{{ interface_name }}']"
+            },
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/area[area-id='{{ area_id }}']/interface[interface-name='{{ interface_name }}']/interface-type",
+                "value": "{{ interface_type }}"
+            },
+            {
+                "action": "update",
+                "path": "/network-instance[name='{{ network_instance }}']/protocols/ospf/instance[name='{{ ospf_instance }}']/area[area-id='{{ area_id }}']/interface[interface-name='{{ interface_name }}']/passive",
+                "value": "{{ "true" if passive else "false" }}"
+            }
+        ]
+    }
+}
