@@ -1,0 +1,25 @@
+
+{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "set",
+    "params": {
+        "commands": 
+        [
+            {
+                "action": "update",
+                "path": "/interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/admin-state",
+                "value": "{{ admin_state }}"
+            },
+            {
+                "action": "update",
+                "path": "/interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/ipv4/admin-state",
+                "value": "{{ ipv4.admin_state }}"
+            },
+            {
+                "action": "update",
+                "path": "/interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/ipv4/address[ip-prefix={{ ipv4.address }}]"
+            }
+        ]
+    }
+}

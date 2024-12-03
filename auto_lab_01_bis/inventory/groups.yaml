@@ -1,0 +1,11 @@
+nokia_srl_jsonrpc:
+  platform: srlinux_jsonrpc
+  username: admin
+  password: NokiaSrl1!
+  port: 80
+
+nokia_srl_netconf:
+  platform: srlinux_netconf
+  username: admin
+  password: NokiaSrl1!
+  port: 830
