@@ -1,7 +1,7 @@
 #### What's this
 
-A example CLAB lab that deploy 3 Nokia SR-Linux nodes doing OSPF, and 3 test hosts
-The goal is deploy the configuration using Ansible and deploy the configuration using NETCONF.
+A example CLAB lab that deploy 3 Nokia SR-Linux nodes doing OSPF, and 3 test hosts.
+The goal is deploy infrastructure as code using ansible and the nokia.srlinux collection.
 
 #### Set up the environment
 
