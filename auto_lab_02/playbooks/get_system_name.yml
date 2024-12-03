@@ -1,0 +1,16 @@
+---
+- name: Get host information
+  hosts: nokia_srl
+  gather_facts: false
+
+  tasks:
+    - name: Get host name
+      nokia.srlinux.get:
+        paths:
+          - path: /system/name/host-name
+            datastore: state
+      register: response_host_name
+
+    - name: Print host name
+      debug:
+        msg: "Current hostname: {{ response_host_name.result }}"

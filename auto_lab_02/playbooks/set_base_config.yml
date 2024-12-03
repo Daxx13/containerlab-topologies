@@ -1,0 +1,79 @@
+---
+- name: Set basic configuration
+  hosts: nokia_srl
+  gather_facts: false
+
+  tasks:
+    - name: Config interfaces
+      loop: "{{ interfaces }}"
+      vars:
+        interface_name: "{{ item.interface_name }}"
+        description: "{{ item.description }}"
+        admin_state: "{{ item.admin_state }}"
+      nokia.srlinux.config:
+        update:
+          - path: /interface[name={{ interface_name }}]/admin-state
+            value: "{{ admin_state }}"
+          - path: /interface[name={{ interface_name }}]/description
+            value: "{{ description }}"
+
+    - name: Config ipv4 subinterfaces
+      loop: "{{ ipv4_subinterfaces }}"
+      vars:
+        interface_name: "{{ item.interface_name }}"
+        subinterface_index: "{{ item.subinterface_index }}"
+        admin_state: "{{ item.admin_state }}"
+        ipv4_address: "{{ item.ipv4.address }}"
+        ipv4_admin_state: "{{ item.ipv4.admin_state }}"
+      nokia.srlinux.config:
+        update:
+          - path: /interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/admin-state
+            value: "{{ admin_state }}"
+          - path: /interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/ipv4/admin-state
+            value: "{{ ipv4_admin_state }}"
+          - path: /interface[name={{ interface_name }}]/subinterface[index={{ subinterface_index }}]/ipv4/address[ip-prefix={{ ipv4_address }}]
+
+
+    - name: Config interface bindings
+      loop: "{{ interface_bindings }}"
+      vars:
+        network_instance: "{{ item.network_instance }}"
+        interface_name: "{{ item.interface_name }}"
+      nokia.srlinux.config:
+        update:
+         - path: /network-instance[name={{ network_instance }}]/interface[name={{ interface_name }}]
+
+
+    - name: Config OSPF instances
+      loop: "{{ ospf_instances }}"
+      vars:
+        network_instance: "{{ item.network_instance }}"
+        ospf_instance: "{{ item.ospf_instance }}"
+        admin_state: "{{ item.admin_state }}"
+        version: "{{ item.version }}"
+        router_id: "{{ item.router_id }}"
+      nokia.srlinux.config:
+        update:
+          - path: /network-instance[name={{ network_instance }}]/protocols/ospf/instance[name={{ ospf_instance }}]/admin-state
+            value: "{{ admin_state }}"
+          - path: /network-instance[name={{ network_instance }}]/protocols/ospf/instance[name={{ ospf_instance }}]/version
+            value: "{{ version }}"
+          - path: /network-instance[name={{ network_instance }}]/protocols/ospf/instance[name={{ ospf_instance }}]/router-id
+            value: "{{ router_id }}"
+
+
+    - name: Config OSPF area interfaces
+      loop: "{{ ospf_area_interfaces }}"
+      vars:
+        network_instance: "{{ item.network_instance }}"
+        ospf_instance: "{{ item.ospf_instance }}"
+        area_id: "{{ item.area_id }}"
+        interface_name: "{{ item.interface_name }}"
+        interface_type: "{{ item.interface_type }}"
+        passive: "{{ item.passive if item.passive is defined else 'false' }}"
+      nokia.srlinux.config:
+        update:
+          - path: /network-instance[name={{ network_instance }}]/protocols/ospf/instance[name={{ ospf_instance }}]/area[area-id={{ area_id }}]/interface[interface-name={{ interface_name }}]/interface-type
+            value: "{{ interface_type }}"
+          - path: /network-instance[name={{ network_instance }}]/protocols/ospf/instance[name={{ ospf_instance }}]/area[area-id={{ area_id }}]/interface[interface-name={{ interface_name }}]/passive
+            value: "{{ passive }}" 
