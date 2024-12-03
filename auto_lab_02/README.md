@@ -1,9 +1,9 @@
-#### What's this
+### What's this
 
 A example CLAB lab that deploy 3 Nokia SR-Linux nodes doing OSPF, and 3 test hosts.
 The goal is deploy infrastructure as code using ansible and the nokia.srlinux collection.
 
-#### Set up the environment
+### Set up the environment
 
 ```bash
 cd auto_lab_02
@@ -26,7 +26,7 @@ ansible-galaxy collection install ansible.netcommon
 sudo clab deploy --reconfigure
 ```
 
-#### Example usage:
+### Example usage:
 
 ```bash
 ansible-inventory --list -i inventory
@@ -40,7 +40,7 @@ traceroute to 192.168.1.254 (192.168.1.254), 30 hops max, 46 byte packets
  3  192.168.1.254  0.502 ms  0.290 ms  0.341 ms
 ```
 
-#### Useful Links:
+### Useful Links:
 
 - [YANG Browser](https://learn.srlinux.dev/yang/browser/)
 - [YANG Tree v24.10.1](https://yang.srlinux.dev/releases/v24.10.1/tree)
