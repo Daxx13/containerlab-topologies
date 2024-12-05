@@ -30,7 +30,6 @@ def render_template(template_name, config_data={}):
         j2_template = jinja2.Template(template)
         rendered_template = j2_template.render(config_data)
 
-        print(rendered_template)
         return rendered_template
 
 
@@ -87,7 +86,7 @@ def netconf_call(host, port, username, password, template, commit=True):
 ################################
 
 
-def get_system_name(task):
+def get_system_name(task, debug):
     if task.host.platform == "srlinux_jsonrpc":
         rendered_template = render_template("json_rpc/get_system_name.j2")
             
@@ -117,14 +116,11 @@ def get_system_name(task):
     else: return Result(host=task.host, failed=True, result=f"Unsupported task/platform: {task.host.hostname} on {task.host.platform}")
 
 
-def set_config(task):
+def set_config(task, debug):
     if task.host.platform == "srlinux_jsonrpc":
         host_data = task.host.get("data", [])
 
         rendered_template = render_template("json_rpc/set_base_config.j2", config_data=host_data)
-
-        print (json.dumps(json.loads(rendered_template), indent=4))
-
 
         result = json_rpc_call(
             host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
@@ -132,8 +128,11 @@ def set_config(task):
             template=rendered_template
         )
 
+        if debug:
+            print(json.dumps(result, indent=4))
+
         return Result( host=task.host, changed=True,
-            result=f"Deployed interfaces configuration on {task.host.hostname}"
+            result=f"Deployed full configuration on {task.host.hostname}"
         )
     
     elif task.host.platform == "srlinux_netconf":
@@ -145,10 +144,12 @@ def set_config(task):
             host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
             template=rendered_template
         )
-        print(result)
+
+        if debug:
+            print(result)
 
         return Result( host=task.host, changed=True,
-            result=f"Deployed interfaces configuration on {task.host.hostname}"
+            result=f"Deployed full configuration on {task.host.hostname}"
         )
     
     else: return Result(host=task.host, failed=True, result=f"Unsupported task/platform: {task.host.hostname} on {task.host.platform}")
@@ -161,7 +162,6 @@ def main():
     # Add arguments
     parser.add_argument("-g", "--get", type=str, help="Type of config to deploy", required=False)
     parser.add_argument("-c", "--config", type=str, help="Type of config to get", required=False)
-    # parser.add_argument("-p", "--protocol", type=str, help="Protocol to use", required=False)
     parser.add_argument("-d", "--debug", help="Enable debug info", required=False, action="store_true")
     args = parser.parse_args()
 
@@ -174,12 +174,12 @@ def main():
     # Run the task based on the provided arguments
     if args.get == "system_name":
         print("Getting system name")
-        result = nr.run(task=get_system_name)
+        result = nr.run(task=get_system_name, debug=args.debug)
         print_result(result)
 
     elif args.config == "all":
         print("Deploying all configurations")
-        result = nr.run(task=set_config)
+        result = nr.run(task=set_config, debug=args.debug)
         print_result(result)
 
     else:

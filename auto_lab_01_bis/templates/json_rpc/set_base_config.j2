@@ -1,5 +1,6 @@
 {%- set commands = [] -%}
 
+{# Configure main interfaces #}
 {% for interface_name, interface in interface.items() %}
 
     {%- set _ = commands.append({
@@ -14,6 +15,7 @@
         'value': interface.description
     }) -%}
 
+    {# Configure IPv4 subinterfaces #}
     {% for subinterface_index, subinterface in interface.subinterface.items() %}
 
         {%- set _ = commands.append({
@@ -37,8 +39,10 @@
 
 {% endfor %}
 
+{# Configure network instances #}
 {% for network_instance_name, network_instance in network_instance.items() %}
 
+    {# Configure network instance interface bindings #}
     {% for interface_name in network_instance.interface %}
 
         {%- set _ = commands.append({
@@ -48,6 +52,7 @@
 
     {% endfor %}
 
+    {# Configure network instance ospf instances #}
     {% for ospf_instance_name, ospf_instance in network_instance.protocols.ospf.items() %}
 
         {%- set _ = commands.append({
@@ -68,6 +73,7 @@
             'value': ospf_instance.router_id
         }) -%}
 
+        {# Configure network instance ospf instance areas and interfaces #}
         {% for area_id, area in ospf_instance.area.items() %}
 
             {%- set _ = commands.append({

@@ -22,6 +22,7 @@ sudo clab deploy --reconfigure
 ```bash
 python3 deploy.py --get system_name
 python3 deploy.py --config all
+python3 deploy.py --config all -d
 
 sudo docker exec -it clab-auto_lab_01_bis-pc1 traceroute -n 192.168.2.254
 traceroute to 192.168.2.254 (192.168.2.254), 30 hops max, 46 byte packets
