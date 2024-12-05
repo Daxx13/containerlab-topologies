@@ -1,0 +1,48 @@
+name: auto_lab_02_bis
+
+topology:
+  kinds:
+    srl:
+      type: ixrd2
+      image: ghcr.io/nokia/srlinux:24.10.1
+
+  nodes:
+    pc1:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 192.168.1.254/24
+      - ip route del default
+      - ip route add default via 192.168.1.1
+    pc2:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 192.168.2.254/24
+      - ip route del default
+      - ip route add default via 192.168.2.1
+    pc3:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 192.168.3.254/24
+      - ip route del default
+      - ip route add default via 192.168.3.1
+    r1:
+      kind: srl
+      startup-config: config/srl_nodes_config.cfg
+    r2:
+      kind: srl
+      startup-config: config/srl_nodes_config.cfg
+    r3:
+      kind: srl
+      startup-config: config/srl_nodes_config.cfg
+
+  links:
+    - endpoints: ["pc1:eth1", "r1:e1-1"] 
+    - endpoints: ["pc2:eth1", "r2:e1-1"]
+    - endpoints: ["pc3:eth1", "r3:e1-1"]
+
+    - endpoints: ["r1:e1-55", "r2:e1-55"]
+    - endpoints: ["r1:e1-56", "r3:e1-55"]
+    - endpoints: ["r2:e1-56", "r3:e1-56"]

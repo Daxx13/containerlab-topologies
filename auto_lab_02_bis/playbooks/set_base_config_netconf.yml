@@ -1,0 +1,27 @@
+---
+- name: Set basic configuration
+  hosts: nokia_srl_netconf
+  gather_facts: false
+
+  tasks:
+    - name: Execute NETCONF get system_name RPC
+      ansible.netcommon.netconf_rpc:
+        rpc: edit-config
+        xmlns: urn:ietf:params:xml:ns:netconf:base:1.0
+        content: "{{ lookup('template', '{{ playbook_dir }}/../templates/netconf/set_base_config.xml') }}"
+      register: rpc_response
+    
+    - name: Convert XML response to dictionary
+      set_fact:
+        response_dict: "{{ rpc_response.stdout | ansible.utils.from_xml }}"
+
+    - name: Check if ok or failed
+      fail:
+        msg: "Failed to set base configuration"
+      when: "'ok' not in response_dict['rpc-reply']"
+
+    - name: Commit the configuration
+      ansible.netcommon.netconf_rpc:
+        rpc: commit
+        xmlns: urn:ietf:params:xml:ns:netconf:base:1.0
+      register: rpc_response

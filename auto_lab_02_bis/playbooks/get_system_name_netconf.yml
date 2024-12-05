@@ -1,0 +1,33 @@
+---
+- name: Get host information
+  hosts: nokia_srl_netconf
+  gather_facts: false
+
+  tasks:
+    
+    - name: Execute NETCONF get system_name RPC
+      ansible.netcommon.netconf_rpc:
+        rpc: get
+        xmlns: urn:ietf:params:xml:ns:netconf:base:1.0
+        content: |
+          <filter type="subtree">
+            <system xmlns="urn:nokia.com:srlinux:general:system">
+                <name xmlns="urn:nokia.com:srlinux:chassis:system-name">
+                    <host-name />
+                </name>
+            </system>
+          </filter>
+
+      register: rpc_response
+
+    - name: Convert XML response to dictionary
+      set_fact:
+        response_dict: "{{ rpc_response.stdout | ansible.utils.from_xml }}"
+
+    - name: Extract hostname from response
+      set_fact:
+        hostname: "{{ response_dict['rpc-reply']['data']['system']['name']['host-name'] }}"
+
+    - name: Show the extracted hostname
+      debug:
+        msg: "Hostname: {{ hostname }}"

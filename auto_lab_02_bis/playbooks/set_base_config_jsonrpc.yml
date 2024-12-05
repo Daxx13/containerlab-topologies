@@ -1,0 +1,37 @@
+---
+- name: Set basic configuration
+  hosts: nokia_srl_jsonrpc
+  gather_facts: false
+
+  tasks:
+
+    - name: Execute the JSON RPC request using the template
+      uri:
+        url: "http://{{ ansible_host }}/jsonrpc"
+        method: POST
+        body: |
+          {
+            "jsonrpc": "2.0",
+            "method": "set",
+            "params": {
+              "commands": {{ lookup('template', '{{ playbook_dir }}/../templates/json_rpc/set_base_config.j2') }}
+            },
+            "id": 1
+          }
+        headers:
+          Content-Type: "application/json"
+        body_format: json
+        user: "{{ ansible_user }}"  # Use ansible_user for authentication
+        password: "{{ ansible_password }}"  # Use ansible_password if it's set
+        return_content: yes
+      register: rpc_response
+
+    # - name: Show the response
+    #   debug:
+    #     var: rpc_response
+
+    - name: Check if ok or failed
+      fail:
+        msg: "Failed to set base configuration"
+      when: "'error' in rpc_response.json"
+
