@@ -1,14 +1,8 @@
-{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "get",
-    "params": {
-        "commands":
-        [
-            {
-                "path": "/system/name",
-                "datastore": "state"
-            }
-        ]
-    }
-}
+{%- set commands = [] -%}
+
+{%- set _ = commands.append({
+    "path": "/system/name",
+    "datastore": "state"
+}) -%}
+
+{{ commands | tojson }}

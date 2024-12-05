@@ -1,5 +1,6 @@
 import argparse
 import jinja2
+import json
 import requests
 import xmltodict
 
@@ -29,21 +30,30 @@ def render_template(template_name, config_data={}):
         j2_template = jinja2.Template(template)
         rendered_template = j2_template.render(config_data)
 
+        print(rendered_template)
         return rendered_template
 
 
 # This function will perform a JSON-RPC call
 # to the provided host, port, username, password, and template
 # and return the JSON response
-def json_rpc_call(host, port, username, password, template):
+def json_rpc_call(host, port, username, password, method, template):
     """Perform a JSON-RPC call."""
 
     url = f"http://{host}:{port}/jsonrpc"
     headers = {"Content-Type": "application/json"}
+    data = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": {
+            "commands": json.loads(template)
+        }
+    }
 
-    response = requests.post(url, headers=headers, data=template, auth=(username, password))
+    response = requests.post(url, headers=headers, data=json.dumps(data), auth=(username, password))
 
-    if response.status_code != 200:
+    if response.status_code != 200 or response.json().get("error"):
         raise Exception(f"JSON-RPC Error: {response.status_code} {response.text}")
 
     return response.json()
@@ -83,6 +93,7 @@ def get_system_name(task):
             
         result = json_rpc_call(
             host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
+            method="get",
             template=rendered_template
         )
 
@@ -109,23 +120,26 @@ def get_system_name(task):
 def set_config(task):
     if task.host.platform == "srlinux_jsonrpc":
         host_data = task.host.get("data", [])
-        # for interface in host_data["interfaces"]:
 
-        #     rendered_template = render_template("json_rpc/update_interface.j2", config_data=interface)
+        rendered_template = render_template("json_rpc/set_base_config.j2", config_data=host_data)
 
-        #     result = json_rpc_call(
-        #         host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
-        #         template=rendered_template
-        #     )
+        print (json.dumps(json.loads(rendered_template), indent=4))
 
-        # return Result( host=task.host, changed=True,
-        #     result=f"Deployed interfaces configuration on {task.host.hostname}"
-        # )
+
+        result = json_rpc_call(
+            host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
+            method="set",
+            template=rendered_template
+        )
+
+        return Result( host=task.host, changed=True,
+            result=f"Deployed interfaces configuration on {task.host.hostname}"
+        )
     
     elif task.host.platform == "srlinux_netconf":
         host_data = task.host.get("data", [])
 
-        rendered_template = render_template("netconf/base_config.xml", config_data=host_data)
+        rendered_template = render_template("netconf/set_base_config.xml", config_data=host_data)
         
         result = netconf_call(
             host=task.host.hostname, port=task.host.port, username=task.host.username, password=task.host.password,
@@ -167,48 +181,6 @@ def main():
         print("Deploying all configurations")
         result = nr.run(task=set_config)
         print_result(result)
-
-    # elif args.config == "all":
-    #     print("Deploying all configurations")
-        
-    #     result = nr.run(task=get_system_name)
-    #     print_result(result)
-    #     result = nr.run(task=configure_interfaces)
-    #     print_result(result)
-    #     result = nr.run(task=configure_ipv4_subinterfaces)
-    #     print_result(result)
-    #     result = nr.run(task=configure_network_instance_bindings)
-    #     print_result(result)
-    #     result = nr.run(task=configure_ospf_instances)
-    #     print_result(result)
-    #     result = nr.run(task=configure_ospf_area_interfaces)
-    #     print_result(result)
-
-
-    # elif args.config == "interfaces":
-    #     print("Deploying interfaces configuration")
-    #     result = nr.run(task=configure_interfaces)
-    #     print_result(result)
-
-    # elif args.config == "ipv4_subinterfaces":
-    #     print("Deploying IPv4 subinterfaces configuration")
-    #     result = nr.run(task=configure_ipv4_subinterfaces)
-    #     print_result(result)
-
-    # elif args.config == "network_instance_bindings":
-    #     print("Deploying network instance bindings configuration")
-    #     result = nr.run(task=configure_network_instance_bindings)
-    #     print_result(result)
-
-    # elif args.config == "ospf_instances":
-    #     print("Deploying OSPF instances configuration")
-    #     result = nr.run(task=configure_ospf_instances)
-    #     print_result(result)
-
-    # elif args.config == "ospf_area_interfaces":
-    #     print("Deploying OSPF area interfaces configuration")
-    #     result = nr.run(task=configure_ospf_area_interfaces)
-    #     print_result(result)
 
     else:
         print("No configuration to get/deploy")

@@ -1,14 +1,14 @@
 clab-auto_lab_01_bis-r1:
   hostname: clab-auto_lab_01_bis-r1
   groups:
-  - nokia_srl_netconf
+  - nokia_srl_jsonrpc
   data:
     interface:
       ethernet-1/1:
         description: TO_PC1
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -17,7 +17,7 @@ clab-auto_lab_01_bis-r1:
         description: TO_R2
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -26,7 +26,7 @@ clab-auto_lab_01_bis-r1:
         description: TO_R3
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -48,12 +48,12 @@ clab-auto_lab_01_bis-r1:
                 0.0.0.0:
                   interface:
                     ethernet-1/1.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                       passive: "true"
                     ethernet-1/55.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                     ethernet-1/56.0:
-                      type: point-to-point
+                      interface_type: point-to-point
 
 
 clab-auto_lab_01_bis-r2:
@@ -66,7 +66,7 @@ clab-auto_lab_01_bis-r2:
         description: TO_PC1
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -75,7 +75,7 @@ clab-auto_lab_01_bis-r2:
         description: TO_R1
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -84,7 +84,7 @@ clab-auto_lab_01_bis-r2:
         description: TO_R3
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -106,12 +106,12 @@ clab-auto_lab_01_bis-r2:
                 0.0.0.0:
                   interface:
                     ethernet-1/1.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                       passive: "true"
                     ethernet-1/55.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                     ethernet-1/56.0:
-                      type: point-to-point
+                      interface_type: point-to-point
 
 
 clab-auto_lab_01_bis-r3:
@@ -124,7 +124,7 @@ clab-auto_lab_01_bis-r3:
         description: TO_PC1
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -133,7 +133,7 @@ clab-auto_lab_01_bis-r3:
         description: TO_R1
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -142,7 +142,7 @@ clab-auto_lab_01_bis-r3:
         description: TO_R2
         admin_state: enable
         subinterface:
-          0:
+          "0":
             admin_state: enable
             ipv4:
               admin_state: enable
@@ -164,12 +164,12 @@ clab-auto_lab_01_bis-r3:
                 0.0.0.0:
                   interface:
                     ethernet-1/1.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                       passive: "true"
                     ethernet-1/55.0:
-                      type: point-to-point
+                      interface_type: point-to-point
                     ethernet-1/56.0:
-                      type: point-to-point
+                      interface_type: point-to-point
 
                       
 

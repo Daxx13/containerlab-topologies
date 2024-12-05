@@ -8,18 +8,18 @@
       <name>{{ interface_name }}</name>
       <admin-state>{{ interface.admin_state }}</admin-state>
       <description>{{ interface.description }}</description>
-        {% for subinterface_id, subinterface in interface.subinterface.items() %}
+        {% for subinterface_index, subinterface in interface.subinterface.items() %}
         <subinterface>
-      <index>{{ subinterface_id }}</index>
-      <admin-state>{{ subinterface.admin_state }}</admin-state>
-        <ipv4>
-          <admin-state>{{ subinterface.ipv4.admin_state }}</admin-state>
-          <address>
-            <ip-prefix>{{ subinterface.ipv4.address }}</ip-prefix>
-          </address>
-        </ipv4>
-      </subinterface>
-      {% endfor %}
+          <index>{{ subinterface_index }}</index>
+          <admin-state>{{ subinterface.admin_state }}</admin-state>
+          <ipv4>
+            <admin-state>{{ subinterface.ipv4.admin_state }}</admin-state>
+            <address>
+              <ip-prefix>{{ subinterface.ipv4.address }}</ip-prefix>
+            </address>
+          </ipv4>
+        </subinterface>
+        {% endfor %}
     </interface>
     {% endfor %}
     {% for network_instance_name, network_instance in network_instance.items() %}
@@ -46,7 +46,7 @@
             {% for interface_name, interface in area.interface.items() %}
             <interface>
               <interface-name>{{ interface_name }}</interface-name>
-              <interface-type>{{ interface.type }}</interface-type>
+              <interface-type>{{ interface.interface_type }}</interface-type>
               <passive>{{ interface.passive if interface.passive is defined else "false" }}</passive>
             </interface>
             {% endfor %}

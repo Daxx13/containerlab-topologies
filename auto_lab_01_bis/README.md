@@ -12,16 +12,28 @@ source nornir_env/bin/activate
 pip install nornir nornir_utils jinja2 requests ncclient xmltodict
 ```
 
+### Start CLAB
+```bash
+sudo clab deploy --reconfigure
+```
+
 #### Example usage:
 
 ```bash
 python3 deploy.py --get system_name
 python3 deploy.py --config all
-# python3 deploy.py --config interfaces
-# python3 deploy.py --config ipv4_subinterfaces
-# python3 deploy.py --config network_instance_bindings
-# python3 deploy.py --config ospf_instances
-# python3 deploy.py --config ospf_area_interfaces
+
+sudo docker exec -it clab-auto_lab_01_bis-pc1 traceroute -n 192.168.2.254
+traceroute to 192.168.2.254 (192.168.2.254), 30 hops max, 46 byte packets
+ 1  192.168.1.1  1.378 ms  0.565 ms  0.992 ms
+ 2  99.1.2.2  1.280 ms  0.843 ms  0.852 ms
+ 3  192.168.2.254  0.368 ms  0.407 ms  0.320 ms
+
+sudo docker exec -it clab-auto_lab_01_bis-pc1 traceroute -n 192.168.3.254
+traceroute to 192.168.3.254 (192.168.3.254), 30 hops max, 46 byte packets
+ 1  192.168.1.1  1.032 ms  0.561 ms  0.877 ms
+ 2  99.1.3.2  1.756 ms  0.847 ms  0.887 ms
+ 3  192.168.3.254  0.551 ms  0.495 ms  0.387 ms
 ```
 
 #### Useful Links:
