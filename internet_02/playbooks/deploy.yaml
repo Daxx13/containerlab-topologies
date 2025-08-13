@@ -30,8 +30,9 @@
       lines:
         - set protocols isis interface {{ item.key }}
 
-  - name: Configure Segment Routing SRv6 interfaces
-    loop: "{{ merged_config.protocols.segment-routing.interface | dict2items }}"
-    vyos.vyos.vyos_config:
-      lines:
-        - set protocols segment-routing interface {{ item.key }} srv6
+  # - name: Configure Segment Routing SRv6 interfaces
+  #   loop: "{{ (merged_config.protocols['segment-routing'].interface | default({})) | dict2items }}"
+  #   when: merged_config.protocols.segment-routing.interface is defined"
+  #   vyos.vyos.vyos_config:
+  #     lines:
+  #       - set protocols segment-routing interface {{ item.key }} srv6
