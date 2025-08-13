@@ -4,6 +4,7 @@ This lab demonstrates how to use [Containerlab](https://containerlab.dev/) and [
 
 Current topology:
 
+```
    [PE1]------[PE2]
      | \      / |
      |  \    /  |
@@ -14,8 +15,8 @@ Current topology:
      |  /    \  |
      | /      \ |
    [PE3]------[PE4]
+```
 
-   
 ### Set up the environment
 
 ```bash
