@@ -31,7 +31,6 @@
         - set protocols isis interface {{ item.key }}
 
   - name: Configure Segment Routing SRv6 interfaces
-    when: merged_config.protocols.segment-routing.interface is defined
     loop: "{{ merged_config.protocols.segment-routing.interface | dict2items }}"
     vyos.vyos.vyos_config:
       lines:
