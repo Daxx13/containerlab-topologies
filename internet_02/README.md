@@ -23,7 +23,7 @@ Current topology:
 cd internet_02
 
 # Install required dependencies
-sudo apt install python3 python3-venv python3-pip -y
+sudo apt install python3 python3-venv python3-pip tcpdump -y
 python3 -m venv ansible_env
 
 # Enable the python venv
@@ -53,7 +53,8 @@ ansible-playbook playbooks/deploy.yaml -i clab-internet_02/ansible-inventory.yml
 
 ### Useful Links:
 
-- [VyOS Containerlab Kind](https://containerlab.dev/manual/kinds/vyosnetworks_vyos/)
+- [Containerlab VyOS Kind info](https://containerlab.dev/manual/kinds/vyosnetworks_vyos/)
 - [VyOS Ansible collection](https://docs.ansible.com/ansible/latest/collections/vyos/vyos/index.html)
 - [VyOS Ansible examples](https://docs.vyos.io/en/latest/configexamples/ansible.html)
 - [VyOS SRv6 L3VPN reference guide](https://www.linkedin.com/posts/vyos_srv6-deployment-l3vpnvpnv6vpnv4-activity-7361003565294768130-pqyo)
+- [VyOS ISIS+SRv6 guide](https://docs.vyos.io/en/latest/configexamples/segment-routing-isis.html)

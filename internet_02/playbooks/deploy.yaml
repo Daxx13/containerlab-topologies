@@ -9,17 +9,28 @@
     set_fact:
       merged_config: "{{ global_config | deepmerge(specific_config) }}"
 
-  - name: Configure loopback interface
-    when: merged_config.interfaces.loopback is defined
+  - name: Configure ethernet interfaces
+    when: merged_config.interfaces.ethernet is defined
+    loop: "{{ merged_config.interfaces.ethernet | dict2items }}"
+    vyos.vyos.vyos_interfaces:
+      config:
+        - name: '{{ item.key }}'
+          description: "ISIS P2P Interface"
+          enabled: true
+
+  - name: Configure dummy (loopback) interface
+    when: merged_config.interfaces.dummy.dum0 is defined
     vyos.vyos.vyos_config:
       lines:
-        - set interfaces loopback lo address '{{ merged_config.interfaces.loopback.lo.address }}'
+        - set interfaces dummy dum0 address '{{ merged_config.interfaces.dummy.dum0.address }}'
 
   - name: Configure ISIS basic settings
     when: merged_config.protocols.isis is defined
     vyos.vyos.vyos_config:
       lines:
-        - set protocols isis interface lo
+        - set protocols isis interface dum0 
+        - set protocols isis log-adjacency-changes
+        - set protocols isis metric-style wide
         - set protocols isis level '{{ merged_config.protocols.isis.level }}'
         - set protocols isis net '{{ merged_config.protocols.isis.net }}'
 
@@ -29,6 +40,20 @@
     vyos.vyos.vyos_config:
       lines:
         - set protocols isis interface {{ item.key }}
+
+  - name: Configure ISIS passive interfaces
+    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
+    when: item.value.passive is defined
+    vyos.vyos.vyos_config:
+      lines:
+        - set protocols isis interface {{ item.key }} passive
+
+  - name: Configure ISIS P2P interfaces
+    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
+    when: item.value.network is defined
+    vyos.vyos.vyos_config:
+      lines:
+        - set protocols isis interface {{ item.key }} network {{ item.value.network }}
 
   # - name: Configure Segment Routing SRv6 interfaces
   #   loop: "{{ (merged_config.protocols['segment-routing'].interface | default({})) | dict2items }}"
