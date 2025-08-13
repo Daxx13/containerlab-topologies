@@ -9,11 +9,17 @@
     set_fact:
       merged_config: "{{ global_config | deepmerge(specific_config) }}"
 
+  - name: Configure loopback interface
+    when: merged_config.interfaces.loopback is defined
+    vyos.vyos.vyos_config:
+      lines:
+        - set interfaces loopback lo address '{{ merged_config.interfaces.loopback.lo.address }}'
+
   - name: Configure ISIS basic settings
     when: merged_config.protocols.isis is defined
     vyos.vyos.vyos_config:
       lines:
-        - set interfaces loopback lo address '{{ merged_config.interfaces.loopback.lo.address }}'
+        - set protocols isis interface lo
         - set protocols isis level '{{ merged_config.protocols.isis.level }}'
         - set protocols isis net '{{ merged_config.protocols.isis.net }}'
 
