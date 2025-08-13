@@ -1,0 +1,39 @@
+---
+- name: Deploy VyOS config from inventory
+  hosts: vyos
+  gather_facts: false
+
+  tasks:
+
+  - name: Merge global and specific configurations
+    set_fact:
+      merged_config: "{{ global_config | deepmerge(specific_config) }}"
+
+  - name: Configure loopback interface
+    when: merged_config.interfaces.loopback is defined
+    vyos.vyos.vyos_config:
+      lines:
+        - set interfaces loopback lo address '{{ merged_config.interfaces.loopback.lo.address }}'
+
+  - name: Configure ISIS basic settings
+    when: merged_config.protocols.isis is defined
+    vyos.vyos.vyos_config:
+      lines:
+        - set protocols isis level '{{ merged_config.protocols.isis.level }}'
+        - set protocols isis net '{{ merged_config.protocols.isis.net }}'
+
+  - name: Configure ISIS interfaces
+    when: merged_config.protocols.isis.interface is defined
+    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
+    vyos.vyos.vyos_config:
+      lines:
+        - set protocols isis interface {{ item.key }}
+
+  - name: Configure Segment Routing SRv6 interfaces
+    when: merged_config.protocols.segment-routing.interface is defined
+    loop: "{{ merged_config.protocols.segment-routing.interface | dict2items }}"
+    vyos.vyos.vyos_config:
+      lines:
+        - set protocols segment-routing interface {{ item.key }} srv6
+
+

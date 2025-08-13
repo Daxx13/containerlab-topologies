@@ -1,0 +1,83 @@
+all:
+  children:
+    vyos:
+      vars:
+        ansible_network_os: vyos
+        ansible_connection: network_cli
+        ansible_user: admin
+        ansible_ssh_pass: admin
+
+        global_config:
+            protocols:
+              isis:
+                interface:
+                  eth1:
+                  eth2:
+                  eth3:
+                  lo:
+              segment-routing:
+                interface:
+                  eth1:
+                    srv6:
+                  eth2:
+                    srv6:
+                  eth3:
+                    srv6:
+                srv6:
+                  locator:
+                    L3VPN:
+                      behavior-usid: {}
+                      prefix: '2001:db8:1:eee::/64'
+
+
+      hosts:
+        clab-internet_02-PE1:
+          specific_config:
+            interfaces:
+              loopback:
+                lo:
+                  address: '2001:db8::1/128'
+
+            protocols:
+              isis:
+                level: level-2
+                net: '49.0000.0000.0000.0001.00'
+                  
+
+        clab-internet_02-PE2:
+          specific_config:
+            interfaces:
+              loopback:
+                lo:
+                  address: '2001:db8::2/128'
+
+            protocols:
+              isis:
+                level: level-2
+                net: '49.0000.0000.0000.0002.00'
+
+
+        clab-internet_02-PE3:
+          specific_config:
+            interfaces:
+              loopback:
+                lo:
+                  address: '2001:db8::3/128'
+
+            protocols:
+              isis:
+                level: level-2
+                net: '49.0000.0000.0000.0003.00'
+
+
+        clab-internet_02-PE4:
+          specific_config:
+            interfaces:
+              loopback:
+                lo:
+                  address: '2001:db8::4/128'
+
+            protocols:
+              isis:
+                level: level-2
+                net: '49.0000.0000.0000.0004.00'

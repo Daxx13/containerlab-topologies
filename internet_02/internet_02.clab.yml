@@ -1,0 +1,28 @@
+name: internet_02
+
+topology:
+
+  nodes:
+    PE1:
+      kind: vyosnetworks_vyos
+      image: vyos:latest
+
+    PE2:
+      kind: vyosnetworks_vyos
+      image: vyos:latest
+
+    PE3:
+      kind: vyosnetworks_vyos
+      image: vyos:latest
+
+    PE4:
+      kind: vyosnetworks_vyos
+      image: vyos:latest
+
+  links:
+    - endpoints: ["PE1:eth1", "PE2:eth1"]
+    - endpoints: ["PE1:eth2", "PE4:eth2"]
+    - endpoints: ["PE1:eth3", "PE3:eth1"]
+    - endpoints: ["PE2:eth2", "PE3:eth2"]
+    - endpoints: ["PE2:eth3", "PE4:eth3"]
+    - endpoints: ["PE3:eth3", "PE4:eth1"]
