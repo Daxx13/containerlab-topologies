@@ -2,6 +2,8 @@
 
 This lab demonstrates how to use [Containerlab](https://containerlab.dev/) and [Ansible](https://www.ansible.com/) to automate the deployment and configuration of a virtual internet topology using VyOS routers. It provides a reproducible environment for testing network automation workflows, experimenting with routing protocols, and learning about infrastructure-as-code practices in a controlled, containerized setup.
 
+Tested using the image: vyos-2025.08.13-0020-rolling
+
 Current topology:
 
 ```

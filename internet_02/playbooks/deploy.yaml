@@ -9,55 +9,39 @@
     set_fact:
       merged_config: "{{ global_config | deepmerge(specific_config) }}"
 
-  - name: Configure ethernet interfaces
-    when: merged_config.interfaces.ethernet is defined
-    loop: "{{ merged_config.interfaces.ethernet | dict2items }}"
-    vyos.vyos.vyos_interfaces:
-      config:
-        - name: '{{ item.key }}'
-          description: "ISIS P2P Interface"
-          enabled: true
+  - name: Parse global config using vyos_parser filter
+    set_fact:
+      vyos_config: "{{ merged_config | vyos_parser }}"
 
-  - name: Configure dummy (loopback) interface
-    when: merged_config.interfaces.dummy.dum0 is defined
-    vyos.vyos.vyos_config:
-      lines:
-        - set interfaces dummy dum0 address '{{ merged_config.interfaces.dummy.dum0.address }}'
+  - name: Debug parsed configuration
+    debug:
+      var: vyos_config
 
-  - name: Configure ISIS basic settings
-    when: merged_config.protocols.isis is defined
-    vyos.vyos.vyos_config:
-      lines:
-        - set protocols isis interface dum0 
-        - set protocols isis log-adjacency-changes
-        - set protocols isis metric-style wide
-        - set protocols isis level '{{ merged_config.protocols.isis.level }}'
-        - set protocols isis net '{{ merged_config.protocols.isis.net }}'
+  - name: Build operations payload in VyOS API format
+    set_fact:
+      vyos_ops: |
+        {% set out = [] %}
+        {% for p in vyos_config %}
+        {% set _ = out.append( { 'op': 'set', 'path': p }) %}
+        {% endfor %}
+        {{ out }}
 
-  - name: Configure ISIS interfaces
-    when: merged_config.protocols.isis.interface is defined
-    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
-    vyos.vyos.vyos_config:
-      lines:
-        - set protocols isis interface {{ item.key }}
+  - name: Debug payload
+    debug:
+      var: vyos_ops
 
-  - name: Configure ISIS passive interfaces
-    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
-    when: item.value.passive is defined
-    vyos.vyos.vyos_config:
-      lines:
-        - set protocols isis interface {{ item.key }} passive
+  - name: Send configuration to VyOS API
+    uri:
+      url: "https://{{ inventory_hostname }}/configure"
+      method: POST
+      body_format: form-multipart
+      body:
+        data: "{{ vyos_ops | to_json }}"
+        key: "admin"
+      validate_certs: no
+    register: result
 
-  - name: Configure ISIS P2P interfaces
-    loop: "{{ merged_config.protocols.isis.interface | dict2items }}"
-    when: item.value.network is defined
-    vyos.vyos.vyos_config:
-      lines:
-        - set protocols isis interface {{ item.key }} network {{ item.value.network }}
+  - name: Debug API response
+    debug:
+      var: result.status
 
-  # - name: Configure Segment Routing SRv6 interfaces
-  #   loop: "{{ (merged_config.protocols['segment-routing'].interface | default({})) | dict2items }}"
-  #   when: merged_config.protocols.segment-routing.interface is defined"
-  #   vyos.vyos.vyos_config:
-  #     lines:
-  #       - set protocols segment-routing interface {{ item.key }} srv6

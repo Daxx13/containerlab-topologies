@@ -5,19 +5,19 @@ topology:
   nodes:
     PE1:
       kind: vyosnetworks_vyos
-      image: vyos:latest
+      image: vyos:2025.08.13-0020-rolling
 
     PE2:
       kind: vyosnetworks_vyos
-      image: vyos:latest
+      image: vyos:2025.08.13-0020-rolling
 
     PE3:
       kind: vyosnetworks_vyos
-      image: vyos:latest
+      image: vyos:2025.08.13-0020-rolling
 
     PE4:
       kind: vyosnetworks_vyos
-      image: vyos:latest
+      image: vyos:2025.08.13-0020-rolling
 
   links:
     - endpoints: ["PE1:eth1", "PE2:eth1"]

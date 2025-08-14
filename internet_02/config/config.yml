@@ -2,6 +2,7 @@ all:
   children:
     vyos:
       vars:
+        # The following values are needed only for CLI deployment
         ansible_network_os: vyos
         ansible_connection: network_cli
         ansible_user: admin
@@ -11,8 +12,11 @@ all:
           interfaces:
             ethernet:
               eth1:
+               description: "Backbone Interface"
               eth2:
+               description: "Backbone Interface"
               eth3:
+                description: "Backbone Interface"
 
           protocols:
             isis:
@@ -28,6 +32,12 @@ all:
                   network: point-to-point
                 dum0:
                   passive:
+
+              segment-routing:
+                srv6:
+                  locator:
+                    L3VPN:
+
             segment-routing:
               interface:
                 eth1:
@@ -39,8 +49,7 @@ all:
               srv6:
                 locator:
                   L3VPN:
-                    behavior-usid: {}
-                    prefix: '2001:db8:1:eee::/64'
+                    behavior-usid:
 
 
       hosts:
@@ -55,6 +64,11 @@ all:
               isis:
                 net: '49.0000.0000.0000.0001.00'
                   
+              segment-routing:
+                srv6:
+                  locator:
+                    L3VPN:
+                      prefix: '2001:db8:100:1::/64'
 
         clab-internet_02-PE2:
           specific_config:
@@ -67,6 +81,11 @@ all:
               isis:
                 net: '49.0000.0000.0000.0002.00'
 
+              segment-routing:
+                srv6:
+                  locator:
+                    L3VPN:
+                      prefix: '2001:db8:100:2::/64'
 
         clab-internet_02-PE3:
           specific_config:
@@ -79,6 +98,11 @@ all:
               isis:
                 net: '49.0000.0000.0000.0003.00'
 
+              segment-routing:
+                srv6:
+                  locator:
+                    L3VPN:
+                      prefix: '2001:db8:100:3::/64'
 
         clab-internet_02-PE4:
           specific_config:
@@ -90,3 +114,9 @@ all:
             protocols:
               isis:
                 net: '49.0000.0000.0000.0004.00'
+
+              segment-routing:
+                srv6:
+                  locator:
+                    L3VPN:
+                      prefix: '2001:db8:100:4::/64'
