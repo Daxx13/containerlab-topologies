@@ -2,7 +2,9 @@ all:
   children:
     vyos:
       vars:
-        # The following values are needed only for CLI deployment
+        vyos_default_api_key: admin
+
+        # The following values are needed only for CLI tasks
         ansible_network_os: vyos
         ansible_connection: network_cli
         ansible_user: admin

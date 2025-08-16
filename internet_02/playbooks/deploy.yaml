@@ -24,7 +24,7 @@
       body_format: form-multipart
       body:
         data: '{"op": "showConfig", "path": []}'
-        key: "admin"
+        key: '{{ vyos_default_api_key }}'
       validate_certs: no
       return_content: yes
     register: before_configuration
@@ -87,7 +87,7 @@
       body_format: form-multipart
       body:
         data: '{"op": "showConfig", "path": []}'
-        key: "admin"
+        key: '{{ vyos_default_api_key }}'
       validate_certs: no
       return_content: yes
     register: new_configuration
