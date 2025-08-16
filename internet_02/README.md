@@ -51,6 +51,8 @@ ansible-inventory --list -i clab-internet_02/ansible-inventory.yml -i config/con
 
 ansible-playbook playbooks/deploy.yaml -i clab-internet_02/ansible-inventory.yml -i config/config.yml
 
+sudo docker exec -it clab-internet_02-CE1 ping 192.168.2.254
+sudo docker exec -it clab-internet_02-CE1 ping -6 fd01:100:2::FFFF
 ```
 
 ### Useful Links:

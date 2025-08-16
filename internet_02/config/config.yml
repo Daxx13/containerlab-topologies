@@ -12,11 +12,11 @@ all:
           interfaces:
             ethernet:
               eth1:
-               description: "Backbone Interface"
+               description: Backbone Interface
               eth2:
-               description: "Backbone Interface"
+               description: Backbone Interface
               eth3:
-                description: "Backbone Interface"
+                description: Backbone Interface
 
           protocols:
             isis:
@@ -51,6 +51,53 @@ all:
                   L3VPN:
                     behavior-usid:
 
+            bgp:
+              system-as: 65550
+              peer-group:
+                OVERLAY:
+                  remote-as: internal
+                  update-source: dum0
+                  address-family:
+                    ipv4-vpn:
+                      nexthop-self:
+                    ipv6-vpn:
+                      nexthop-self:
+                  capability:
+                    extended-nexthop:
+              srv6:
+                locator: L3VPN
+
+          vrf:
+            name:
+              customer-100:
+                table: 100
+                protocols:
+                  bgp:
+                    system-as: 65550
+                    address-family:
+                      ipv4-unicast:
+                        export: vpn
+                        import: vpn
+                        redistribute:
+                          connected:
+                        route-target:
+                          vpn:
+                            export: 65550:100
+                            import: 65550:100
+                      ipv6-unicast:
+                        export: vpn
+                        import: vpn
+                        redistribute:
+                          connected:
+                        route-target:
+                          vpn:
+                            export: 65550:100
+                            import: 65550:100
+                    sid:
+                      vpn:
+                        per-vrf:
+                          export: auto
+
 
       hosts:
         clab-internet_02-PE1:
@@ -58,65 +105,196 @@ all:
             interfaces:
               dummy:
                 dum0:
-                  address: '2001:db8::1/128'
+                  address: 2001:db8::1/128
+
+              ethernet:
+                eth4:
+                  address: 
+                    - 192.168.1.1/24
+                    - fd01:100:1::1/64
+                  description: Connection to CE1
+                  vrf: customer-100
 
             protocols:
               isis:
-                net: '49.0000.0000.0000.0001.00'
+                net: 49.0000.0000.0000.0001.00
                   
               segment-routing:
                 srv6:
                   locator:
                     L3VPN:
-                      prefix: '2001:db8:100:1::/64'
+                      prefix: 2001:db8:100:1::/64
+
+              bgp:
+                parameters:
+                  router-id: 10.0.0.1
+                neighbor:
+                  2001:db8::2:
+                    peer-group: OVERLAY
+                  2001:db8::3:
+                    peer-group: OVERLAY
+                  2001:db8::4:
+                    peer-group: OVERLAY
+
+            vrf:
+              name:
+                customer-100:
+                  protocols:
+                    bgp:
+                      parameters:
+                        router-id: 10.0.0.1
+                      address-family:
+                        ipv4-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.1:100
+                        ipv6-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.1:100
 
         clab-internet_02-PE2:
           specific_config:
             interfaces:
               dummy:
                 dum0:
-                  address: '2001:db8::2/128'
+                  address: 2001:db8::2/128
+
+              ethernet:
+                eth4:
+                  address: 
+                    - 192.168.2.1/24
+                    - fd01:100:2::1/64
+                  description: Connection to CE2
+                  vrf: customer-100
+
 
             protocols:
               isis:
-                net: '49.0000.0000.0000.0002.00'
+                net: 49.0000.0000.0000.0002.00
 
               segment-routing:
                 srv6:
                   locator:
                     L3VPN:
-                      prefix: '2001:db8:100:2::/64'
+                      prefix: 2001:db8:100:2::/64
+
+              bgp:
+                parameters:
+                  router-id: 10.0.0.2
+                neighbor:
+                  2001:db8::1:
+                    peer-group: OVERLAY
+                  2001:db8::3:
+                    peer-group: OVERLAY
+                  2001:db8::4:
+                    peer-group: OVERLAY
+
+            vrf:
+              name:
+                customer-100:
+                  protocols:
+                    bgp:
+                      parameters:
+                        router-id: 10.0.0.2
+                      address-family:
+                        ipv4-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.2:100
+                        ipv6-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.2:100
 
         clab-internet_02-PE3:
           specific_config:
             interfaces:
               dummy:
                 dum0:
-                  address: '2001:db8::3/128'
+                  address: 2001:db8::3/128
 
             protocols:
               isis:
-                net: '49.0000.0000.0000.0003.00'
+                net: 49.0000.0000.0000.0003.00
 
               segment-routing:
                 srv6:
                   locator:
                     L3VPN:
-                      prefix: '2001:db8:100:3::/64'
+                      prefix: 2001:db8:100:3::/64
+
+              bgp:
+                parameters:
+                  router-id: 10.0.0.3
+                neighbor:
+                  2001:db8::1:
+                    peer-group: OVERLAY
+                  2001:db8::2:
+                    peer-group: OVERLAY
+                  2001:db8::4:
+                    peer-group: OVERLAY
+
+            vrf:
+              name:
+                customer-100:
+                  protocols:
+                    bgp:
+                      parameters:
+                        router-id: 10.0.0.3
+                      address-family:
+                        ipv4-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.3:100
+                        ipv6-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.3:100
 
         clab-internet_02-PE4:
           specific_config:
             interfaces:
               dummy:
                 dum0:
-                  address: '2001:db8::4/128'
+                  address: 2001:db8::4/128
 
             protocols:
               isis:
-                net: '49.0000.0000.0000.0004.00'
+                net: 49.0000.0000.0000.0004.00
 
               segment-routing:
                 srv6:
                   locator:
                     L3VPN:
-                      prefix: '2001:db8:100:4::/64'
+                      prefix: 2001:db8:100:4::/64
+
+              bgp:
+                parameters:
+                  router-id: 10.0.0.4
+                neighbor:
+                  2001:db8::1:
+                    peer-group: OVERLAY
+                  2001:db8::2:
+                    peer-group: OVERLAY
+                  2001:db8::3:
+                    peer-group: OVERLAY
+
+            vrf:
+              name:
+                customer-100:
+                  protocols:
+                    bgp:
+                      parameters:
+                        router-id: 10.0.0.4
+                      address-family:
+                        ipv4-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.4:100
+                        ipv6-unicast:
+                          rd:
+                            vpn:
+                              export: 10.0.0.4:100
+
+                                  

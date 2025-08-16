@@ -19,6 +19,29 @@ topology:
       kind: vyosnetworks_vyos
       image: vyos:2025.08.13-0020-rolling
 
+    CE1:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 192.168.1.254/24
+      - ip route del default
+      - ip route add default via 192.168.1.1
+      - ip -6 address add dev eth1 fd01:100:1::FFFF/64
+      - ip -6 route del default
+      - ip -6 route add default via fd01:100:1::1
+
+    CE2:
+      kind: linux
+      image: alpine:latest
+      exec:
+      - ip address add dev eth1 192.168.2.254/24
+      - ip route del default
+      - ip route add default via 192.168.2.1
+      - ip -6 address add dev eth1 fd01:100:2::FFFF/64
+      - ip -6 route del default
+      - ip -6 route add default via fd01:100:2::1
+
+
   links:
     - endpoints: ["PE1:eth1", "PE2:eth1"]
     - endpoints: ["PE1:eth2", "PE4:eth2"]
@@ -26,3 +49,6 @@ topology:
     - endpoints: ["PE2:eth2", "PE3:eth2"]
     - endpoints: ["PE2:eth3", "PE4:eth3"]
     - endpoints: ["PE3:eth3", "PE4:eth1"]
+
+    - endpoints: ["PE1:eth4", "CE1:eth1"]
+    - endpoints: ["PE2:eth4", "CE2:eth1"]

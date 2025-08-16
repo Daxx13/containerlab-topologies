@@ -13,9 +13,25 @@
     set_fact:
       vyos_config: "{{ merged_config | vyos_parser }}"
 
-  - name: Debug parsed configuration
-    debug:
-      var: vyos_config
+  # - name: Debug parsed configuration
+  #   debug:
+  #     var: vyos_config
+
+  - name: Get device config from VyOS API
+    uri:
+      url: "https://{{ inventory_hostname }}/retrieve"
+      method: POST
+      body_format: form-multipart
+      body:
+        data: '{"op": "showConfig", "path": []}'
+        key: "admin"
+      validate_certs: no
+      return_content: yes
+    register: before_configuration
+
+  # - name: Debug current configuration
+  #   debug:
+  #     var: before_configuration.content
 
   - name: Build operations payload in VyOS API format
     set_fact:
@@ -26,10 +42,10 @@
         {% endfor %}
         {{ out }}
 
-  - name: Debug payload
-    debug:
-      var: vyos_ops
-
+  # - name: Debug payload
+  #   debug:
+  #     var: vyos_ops
+    
   - name: Send configuration to VyOS API
     uri:
       url: "https://{{ inventory_hostname }}/configure"
@@ -39,9 +55,41 @@
         data: "{{ vyos_ops | to_json }}"
         key: "admin"
       validate_certs: no
+      return_content: yes
     register: result
 
-  - name: Debug API response
+  # - name: Debug API response
+  #   debug:
+  #     var: result
+
+  - name: Wait 5s for the network to stabilize
+    pause:
+      seconds: 5
+
+  - name: Fix connectivity problems with first ping
+    # execute on PE1 only
+    when: inventory_hostname == "clab-internet_02-PE1"
+    vyos.vyos.vyos_command:
+      commands:
+        - ping 192.168.2.1 count 3 source-address 192.168.1.1 vrf customer-100
+        - ping fd01:100:2::1 count 3 source-address fd01:100:1::1 vrf customer-100
+    register: ping_result
+
+  - name: Debug ping result
+    when: inventory_hostname == "clab-internet_02-PE1"
     debug:
-      var: result.status
+      var: ping_result
+
+  - name: Get device config from VyOS API and compare with saved config
+    uri:
+      url: "https://{{ inventory_hostname }}/retrieve"
+      method: POST
+      body_format: form-multipart
+      body:
+        data: '{"op": "showConfig", "path": []}'
+        key: "admin"
+      validate_certs: no
+      return_content: yes
+    register: new_configuration
+    changed_when: before_configuration.content != new_configuration.content
 
